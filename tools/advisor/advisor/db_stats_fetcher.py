@@ -28,6 +28,9 @@ class LogStatsParser(TimeSeriesData):
             for token in token_list[1:]
             if token != ':'
         ]
+        is_percentile = stat_values[:2] == ['statistics','Percentiles']
+        if is_percentile:
+          stat_values = stat_values[3:]
         # stat_values = ['P50', '8.4', 'P95', '21.8', 'P99', '33.9', 'P100',
         # '92.0']
         stat_dict = {}
@@ -35,6 +38,8 @@ class LogStatsParser(TimeSeriesData):
             if ix % 2 == 0:
                 stat_name = stat_prefix + metric
                 stat_name = stat_name.lower()  # Note: case insensitive names
+                if is_percentile:
+                    stat_name = 'p' + stat_name
             else:
                 stat_dict[stat_name] = float(metric)
         # stat_dict = {'rocksdb.db.get.micros.p50': 8.4,
